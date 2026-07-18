@@ -1,1 +1,6 @@
 .DS_Store
+# Ignore CAD drawings and backup files
+*.dwg
+*.DWG
+*.bak
+*.BAK
