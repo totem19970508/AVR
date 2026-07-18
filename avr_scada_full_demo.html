@@ -1,3 +1,4 @@
+<!-- AVR SCADA Dashboard Version 1.1 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +16,7 @@ header{height:70px;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;
 .logo{font-size:32px;font-weight:900;color:var(--blue)}
 h1{font-size:22px;margin:0}
 .online{display:flex;align-items:center;gap:8px;font-size:14px}.online:before{content:"";width:10px;height:10px;border-radius:50%;background:var(--green)}
+.version{font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap}
 .controls{margin-left:auto;display:flex;gap:10px;align-items:center}
 input,button,select{height:40px;border:1px solid #d8dee9;border-radius:9px;background:#fff;padding:0 12px;font-size:14px}
 button{cursor:pointer}.primary{background:var(--blue);color:white;border:0;font-weight:700}
@@ -60,7 +62,7 @@ footer{height:100px;background:#fff;border-top:1px solid #e5e7eb;display:grid;gr
 </head>
 <body>
 <header>
-  <div class="logo">◆</div><h1>AVR DISPLAY MONITOR</h1><div class="online">System Online</div>
+  <div class="logo">◆</div><h1>AVR DISPLAY MONITOR</h1><div class="online">System Online</div><div class="version">Ver 1.1</div>
   <div class="controls">
     <input id="search" aria-label="Search module ID" placeholder="Search Module ID, e.g. D125">
     <button type="button" aria-label="Search modules" onclick="searchModule()">🔎 Search</button>
