@@ -28,11 +28,12 @@ main{height:calc(100vh - 170px);position:relative;background:#fff}
 #world{transform-origin:0 0}
 svg{width:1700px;height:760px;display:block}
 .module-outline{fill:#fff;stroke:var(--line);stroke-width:2}
-.status{stroke:#fff;stroke-width:3;cursor:pointer;filter:drop-shadow(0 2px 4px #0003);transform-box:fill-box;transform-origin:center}
+.hit-area{fill:transparent;cursor:pointer}
+.status{stroke:#fff;stroke-width:7;cursor:pointer;filter:drop-shadow(0 2px 4px #0003);transform-box:fill-box;transform-origin:center}
 .status:hover{transform:scale(1.45)}
 .status.healthy{fill:var(--green)}.status.warning{fill:var(--yellow)}.status.fault{fill:var(--red);animation:flash 1s infinite}.status.offline{fill:var(--dark)}
 @keyframes flash{0%,100%{opacity:1;filter:drop-shadow(0 0 3px #f04444)}50%{opacity:.25;filter:drop-shadow(0 0 14px #f04444)}}
-.id{font-size:10px;font-weight:700;text-anchor:middle;fill:#374151;pointer-events:none}
+.id{font-size:22px;font-weight:700;text-anchor:middle;fill:#374151;pointer-events:none}
 .panel{position:absolute;right:18px;top:88px;width:238px;max-height:calc(100% - 104px);overflow:auto;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 8px 24px #0002;padding:12px;z-index:10}
 .panel h2{font-size:16px;margin:0 0 8px;color:var(--red)}
 .row{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:12px}.row b{font-weight:700;text-align:right}
@@ -76,7 +77,7 @@ footer{height:100px;background:#fff;border-top:1px solid #e5e7eb;display:grid;gr
     <small>Hover = tooltip<br>Click = detail panel<br>Drag = pan, wheel = zoom</small>
   </section>
 
-  <div id="viewport"><div id="world"><svg id="board" viewBox="0 0 1700 760"></svg></div></div>
+  <div id="viewport"><div id="world"><svg id="board" viewBox="180 650 4400 1950" aria-label="Original 193-panel screen layout"></svg></div></div>
 
   <aside class="panel">
     <h2 id="title">MODULE D247</h2>
@@ -118,36 +119,38 @@ let counts={healthy:0,warning:0,fault:0,offline:0};
 
 function p(cx,cy,w,h){return `${cx},${cy-h/2} ${cx+w/2},${cy} ${cx},${cy+h/2} ${cx-w/2},${cy}`}
 function el(t,a){const n=document.createElementNS("http://www.w3.org/2000/svg",t);Object.entries(a).forEach(([k,v])=>n.setAttribute(k,v));return n}
-function shape(row,col){
-  if(col<5&&row<4)return false;
-  if(col<3&&row>4)return false;
-  if(col>31-row/2)return false;
-  if(col<row-2)return false;
-  if(col>=20&&col<=23&&row>=4&&row<=6)return false;
-  if(col>=2&&col<=4&&row>=5&&row<=6)return false;
-  return true;
+const layoutRows=11, layoutCols=18;
+// Five true omissions in the original 18 x 11 positional lattice.
+// Partial rhombuses, trapezoids and triangles remain visible in the JPG itself.
+const omitted=new Set(["0,8","0,9","1,8","5,2","5,14"]);
+const rowY=[2485,2366,2187,2007,1828,1648,1469,1289,1111,931,804];
+function moduleCenter(row,col){
+ const startX=row%2===0?345:463;
+ return {cx:startX+col*234.5,cy:rowY[row]};
 }
 const forced={D119:"fault",D139:"warning",D238:"offline",D247:"fault",D422:"warning",D479:"fault",D502:"fault",D472:"warning",D112:"offline",D174:"warning",D223:"offline",D503:"fault"};
 function randStatus(id){if(forced[id])return forced[id];let r=Math.random();return r<.78?"healthy":r<.88?"warning":r<.94?"offline":"fault"}
 function colorClass(s){return s=="healthy"?"greenText":s=="warning"?"yellowText":s=="offline"?"greyText":"red"}
 
-function addModule(id,cx,cy,status){
+function addModule(id,cx,cy,status,row){
  const temp=status=="fault"?68.2:status=="warning"?61.4:status=="offline"?0:(38+Math.random()*12).toFixed(1);
  const volt=status=="fault"?4.62:status=="warning"?4.51:status=="offline"?0:(4.75+Math.random()*.18).toFixed(2);
  const data={id,status,temp:Number(temp),volt:Number(volt),brightness:65,controller:"BC-"+String(Math.ceil(parseInt(id.slice(1))/40)).padStart(2,"0"),port:"P"+((parseInt(id.slice(1))%16)+1),card:"A5S Plus",time:new Date().toLocaleTimeString(),history:Array.from({length:20},()=>35+Math.random()*28)};
  modules[id]=data; counts[status]++;
  const g=el("g",{"data-id":id,id:"g-"+id});
- g.appendChild(el("polygon",{points:p(cx,cy,76,122),class:"module-outline"}));
- g.appendChild(el("polygon",{points:p(cx,cy-8,23,23),class:"status "+status}));
- const text=el("text",{x:cx,y:cy+26,class:"id"});text.textContent=id;g.appendChild(text);svg.appendChild(g);
+ g.appendChild(el("polygon",{points:p(cx,cy,190,285),class:"hit-area"}));
+ g.appendChild(el("polygon",{points:p(cx,cy-28,48,48),class:"status "+status}));
+ const text=el("text",{x:cx,y:cy+58,class:"id"});text.textContent=id;g.appendChild(text);svg.appendChild(g);
  g.onmouseenter=e=>{showTip(e,data);updatePanel(data)};
  g.onmousemove=moveTip; g.onmouseleave=()=>tip.style.display="none"; g.onclick=()=>selectModule(id);
 }
 
-for(let row=0;row<10;row++){for(let col=0;col<34;col++){
- if(!shape(row,col))continue;
- const cx=60+col*72+(row%2)*36, cy=690-row*58; if(cx>1650||cy<50)continue;
- const id="D"+String(col*10+row+1).padStart(3,"0"), st=randStatus(id); addModule(id,cx,cy,st);
+svg.appendChild(el("image",{href:"Doc/screen-layout.jpg",x:0,y:0,width:4678,height:3309,preserveAspectRatio:"none"}));
+let moduleNumber=0;
+for(let row=0;row<layoutRows;row++){for(let col=0;col<layoutCols;col++){
+ if(omitted.has(`${row},${col}`))continue;
+ const {cx,cy}=moduleCenter(row,col);
+ const id="D"+String(++moduleNumber).padStart(3,"0"), st=randStatus(id); addModule(id,cx,cy,st,row);
 }}
 document.getElementById("total").textContent=Object.keys(modules).length;
 document.getElementById("healthyCount").textContent=counts.healthy;
@@ -200,7 +203,7 @@ setInterval(()=>{
  document.getElementById("lastUpdate").textContent=new Date().toLocaleTimeString();
  if(selected)updatePanel(modules[selected]);
 },2000);
-resetView();selectModule("D247");
+resetView();selectModule("D119");
 </script>
 </body>
 </html>
