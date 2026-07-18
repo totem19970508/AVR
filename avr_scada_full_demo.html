@@ -50,7 +50,11 @@ footer{height:100px;background:#fff;border-top:1px solid #e5e7eb;display:grid;gr
 .highlight polygon:first-child{stroke:var(--blue);stroke-width:5}
 @media(max-width:900px){
  body{overflow:auto}header{gap:8px;padding:0 12px}.logo{font-size:24px}h1{font-size:16px}.controls{display:none}
- main{height:680px}.legend{display:none}.panel{position:static;width:auto;margin:10px 12px}footer{height:auto;grid-template-columns:repeat(2,1fr)}
+ main{height:auto;display:flex;flex-direction:column;padding-bottom:10px}
+ #viewport{height:68vh;min-height:420px;order:1;touch-action:none}
+ .panel{position:static;order:2;width:auto;max-height:none;margin:12px}
+ .legend{position:static;order:3;display:block;width:auto;margin:0 12px 12px;transform:none}
+ footer{height:auto;grid-template-columns:repeat(2,1fr);padding:12px}
 }
 </style>
 </head>
@@ -192,10 +196,34 @@ function searchModule(){const id=document.getElementById("search").value.trim().
 function apply(){world.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`}
 function zoomBy(f){scale=Math.min(2.5,Math.max(.35,scale*f));apply()}
 function resetView(){scale=.82;tx=150;ty=10;apply()}
-let drag=false,sx=0,sy=0;
-vp.onpointerdown=e=>{drag=true;sx=e.clientX-tx;sy=e.clientY-ty;vp.setPointerCapture(e.pointerId)}
-vp.onpointermove=e=>{if(drag){tx=e.clientX-sx;ty=e.clientY-sy;apply()}}
-vp.onpointerup=()=>drag=false;
+const pointers=new Map();
+let drag=false,sx=0,sy=0,pinchDistance=0,pinchScale=scale,pinchWorldX=0,pinchWorldY=0;
+function pointerDistance(){const [a,b]=[...pointers.values()];return Math.hypot(b.x-a.x,b.y-a.y)}
+function pointerMidpoint(){const [a,b]=[...pointers.values()];return{x:(a.x+b.x)/2,y:(a.y+b.y)/2}}
+vp.onpointerdown=e=>{
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ vp.setPointerCapture(e.pointerId);
+ if(pointers.size===1){drag=true;sx=e.clientX-tx;sy=e.clientY-ty}
+ if(pointers.size===2){
+  drag=false;pinchDistance=pointerDistance();pinchScale=scale;
+  const mid=pointerMidpoint(),rect=vp.getBoundingClientRect();
+  pinchWorldX=(mid.x-rect.left-tx)/scale;pinchWorldY=(mid.y-rect.top-ty)/scale;
+ }
+}
+vp.onpointermove=e=>{
+ if(!pointers.has(e.pointerId))return;
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pointers.size===2){
+  const mid=pointerMidpoint(),rect=vp.getBoundingClientRect();
+  scale=Math.min(2.5,Math.max(.35,pinchScale*pointerDistance()/pinchDistance));
+  tx=mid.x-rect.left-pinchWorldX*scale;ty=mid.y-rect.top-pinchWorldY*scale;apply();
+ }else if(drag){tx=e.clientX-sx;ty=e.clientY-sy;apply()}
+}
+function endPointer(e){
+ pointers.delete(e.pointerId);
+ if(pointers.size===1){const [p]=pointers.values();drag=true;sx=p.x-tx;sy=p.y-ty}else drag=false;
+}
+vp.onpointerup=endPointer;vp.onpointercancel=endPointer;
 vp.onwheel=e=>{e.preventDefault();zoomBy(e.deltaY<0?1.12:.88)}
 function centerOn(id){const g=document.getElementById("g-"+id);if(!g)return; const box=g.getBBox();tx=vp.clientWidth/2-(box.x+box.width/2)*scale;ty=vp.clientHeight/2-(box.y+box.height/2)*scale;apply()}
 setInterval(()=>{
@@ -203,7 +231,7 @@ setInterval(()=>{
  document.getElementById("lastUpdate").textContent=new Date().toLocaleTimeString();
  if(selected)updatePanel(modules[selected]);
 },2000);
-resetView();selectModule("D119");
+resetView();selectModule("D113");
 </script>
 </body>
 </html>
