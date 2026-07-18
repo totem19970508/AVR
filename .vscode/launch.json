@@ -4,7 +4,13 @@
         {
             "type": "pwa-chrome",
             "request": "launch",
-            "name": "Run AVR SCADA Dashboard",
+            "name": "Open AVR Dashboard on GitHub",
+            "url": "https://totem19970508.github.io/AVR/avr_scada_full_demo.html"
+        },
+        {
+            "type": "pwa-chrome",
+            "request": "launch",
+            "name": "Preview AVR Dashboard Locally",
             "url": "http://localhost:8080/avr_scada_full_demo.html",
             "webRoot": "${workspaceFolder}",
             "preLaunchTask": "Start AVR web server"
