@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EOI - presentation</title>
+    <style>
+      :root {
+        --bg: #07111f;
+        --panel: #102238;
+        --text: #f3f7fb;
+        --muted: #9eb2c7;
+        --accent: #4fc3f7;
+      }
+
+      * { box-sizing: border-box; }
+
+      img { border-radius: 12px; }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        padding-left: 180px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background:
+          radial-gradient(circle at top, rgba(79, 195, 247, 0.14), transparent 38%),
+          linear-gradient(135deg, var(--bg), #0f2238 70%, #15314a);
+        color: var(--text);
+      }
+
+      .site-nav {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 100;
+        width: 180px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 24px 14px;
+        background: #06182b;
+        border-right: 1px solid rgba(255,255,255,.12);
+      }
+
+      .site-nav a { padding: 12px 14px; border-radius: 10px; color: #afc3d9; font-weight: 700; text-decoration: none; }
+      .site-nav a:hover { background: #123653; color: #fff; }
+      .site-nav a.active { background: var(--accent); color: #07111f; }
+
+      main {
+        width: min(1100px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 48px 0;
+      }
+
+      header {
+        margin-bottom: 28px;
+        text-align: center;
+      }
+
+      .company-logo {
+        display: block;
+        width: min(260px, 70vw);
+        height: 64px;
+        margin: 0 auto 20px;
+        object-fit: contain;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(2rem, 6vw, 4rem);
+        letter-spacing: -0.04em;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .picture-link {
+        position: relative;
+        display: block;
+        min-height: 280px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 20px;
+        background: var(--panel);
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+      }
+
+      .picture-link:first-child {
+        grid-column: 1 / -1;
+        min-height: 220px;
+        padding: 42px;
+      }
+
+      .picture-link:hover,
+      .picture-link:focus-visible {
+        transform: translateY(-4px);
+        border-color: var(--accent);
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.38);
+        outline: none;
+      }
+
+      .picture-link img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        transition: transform 300ms ease;
+      }
+
+      .picture-link:first-child img { object-fit: contain; }
+      .picture-link:hover img { transform: scale(1.025); }
+
+      .picture-link span {
+        position: absolute;
+        right: 16px;
+        bottom: 16px;
+        padding: 9px 13px;
+        border-radius: 999px;
+        background: rgba(7, 17, 31, 0.86);
+        color: var(--text);
+        font-size: 0.9rem;
+        font-weight: 700;
+        backdrop-filter: blur(6px);
+      }
+
+      .photo-credit {
+        position: absolute;
+        left: 16px;
+        bottom: 16px;
+        padding: 9px 13px;
+        border-radius: 999px;
+        background: rgba(7, 17, 31, 0.86);
+        color: var(--muted);
+        font-size: 0.9rem;
+        backdrop-filter: blur(6px);
+      }
+
+      .photo-credit strong {
+        color: #ffe066;
+        font-weight: 800;
+      }
+
+      @media (max-width: 700px) {
+        body { padding: 64px 0 0; }
+        .site-nav { inset: 0 0 auto; width: auto; height: 56px; padding: 7px 10px; flex-direction: row; justify-content: center; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+        .site-nav a { padding: 10px; font-size: .85rem; }
+        main { width: min(100% - 24px, 1100px); padding: 30px 0; }
+        .gallery { grid-template-columns: 1fr; gap: 14px; }
+        .picture-link,
+        .picture-link:first-child { grid-column: auto; min-height: 220px; }
+        .picture-link:first-child { padding: 24px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a class="active" href="index.html" aria-current="page">Home</a>
+      <a href="HTML/scada_full_demo.html">Display Monitor</a>
+      <a href="HTML/av_monitor.html">AV Monitor</a>
+    </nav>
+    <main>
+      <header>
+        <img class="company-logo" src="JPG/Clear logo horizontal.bmp" alt="Clear company logo" />
+        <h1>EOI - presentation</h1>
+        <p>Select any picture to view the flowchart.</p>
+      </header>
+
+      <section class="gallery" aria-label="Presentation images">
+        <a
+          class="picture-link"
+          href="https://viewer.autodesk.com/id/dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6YTM2MHZpZXdlci1wcm90ZWN0ZWQvdDE3ODQ1Njg3MTJfNDQ2N2U3MjItMTY1Ni00YTNkLTgyMmUtYjk3MDgxMmI2ODRiLnN0cA?sheetId=NGIxYTI2NmItMzViOS00MDFiLWI3NmEtOTEzOThjZmIyZTU0"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open the 3D model in Autodesk Viewer (opens in a new tab)"
+        >
+          <img src="JPG/Changi-airport.png" alt="Changi Airport" />
+          <div class="photo-credit">Credit to <strong>Jino Lee</strong></div>
+          <span>View 3D model</span>
+        </a>
+        <a class="picture-link" href="flowchart.html" aria-label="Open flowchart from presentation picture 1">
+          <img src="JPG/pic1.jpeg" alt="Presentation picture 1" />
+          <span>View flowchart</span>
+        </a>
+        <a class="picture-link" href="flowchart.html" aria-label="Open flowchart from presentation picture 2">
+          <img src="JPG/pic2.jpeg" alt="Presentation picture 2" />
+          <span>View flowchart</span>
+        </a>
+      </section>
+    </main>
+  </body>
+</html>
